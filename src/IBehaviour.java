@@ -1,7 +1,11 @@
 public interface IBehaviour {
     void move();
-    double getx();
-    double gety();
-    void setx(double x);
-    void sety(double y);
+
+    int getx();
+
+    int gety();
+
+    void setx(int x);
+
+    void sety(int y);
 }

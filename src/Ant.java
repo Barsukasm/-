@@ -1,8 +1,15 @@
+import java.applet.Applet;
+
 public abstract class Ant implements IBehaviour {
 
-    private double dx,dy;
+    protected int dx, dy;
 
-    public Ant(double x, double y){
+    public Ant() {
+        dx = 0;
+        dy = 0;
+    }
+
+    public Ant(int x, int y) {
         dx = x;
         dy = y;
     }
@@ -11,22 +18,22 @@ public abstract class Ant implements IBehaviour {
     public abstract void move();
 
     @Override
-    public double getx() {
+    public int getx() {
         return dx;
     }
 
     @Override
-    public double gety() {
+    public int gety() {
         return dy;
     }
 
     @Override
-    public void setx(double x) {
+    public void setx(int x) {
         dx=x;
     }
 
     @Override
-    public void sety(double y) {
+    public void sety(int y) {
         dy=y;
     }
 }

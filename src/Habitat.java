@@ -1,3 +1,5 @@
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 
 public class Habitat {
@@ -16,6 +18,16 @@ public class Habitat {
     }
 
     void update(){
+        JFrame f = new JFrame("AntsSimulator");
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setBounds(25, 25, 300, 300);
+
+        ants.add(new AntWorker(123, 225));
+        ants.add(new AntWarrior(45, 10));
+
+        AntsVision av = new AntsVision(ants);
+        f.add(av);
+        f.setVisible(true);
 
     }
 
