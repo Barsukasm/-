@@ -1,5 +1,3 @@
-import java.applet.Applet;
-
 public abstract class Ant implements IBehaviour {
 
     protected int dx, dy;
