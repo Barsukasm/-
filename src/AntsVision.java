@@ -1,67 +1,38 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 public class AntsVision extends JPanel {
 
-    public AntsVision(ArrayList<Ant> ants, int e, boolean tv, boolean st) {
-        this.ants = ants;
-        if (st) {
-            elapsed = e;
+
+    public void paint(Ant a) {
+        if (a instanceof AntWorker) {
+            getGraphics().drawImage(AntWorker.img, a.getx(), a.gety(), this);
+        } else {
+            getGraphics().drawImage(AntWarrior.img, a.getx(), a.gety(), this);
         }
-        timeVisible = tv;
-        status = st;
     }
 
-    private ArrayList<Ant> ants;
-    static int elapsed;
-    boolean timeVisible = false;
-    boolean status = false;
 
-    public void paint(Graphics g, Ant a) {
-        if (a instanceof AntWorker) {
-            g.drawImage(AntWorker.img, a.getx(), a.gety(), this);
-        } else {
-            g.drawImage(AntWarrior.img, a.getx(), a.gety(), this);
-        }
+    public void paint(int total, int workers, int warriors, int elapsed) {
+        paintComponent(getGraphics());
+        this.removeAll();
+        Font f1 = new Font("TimesRoman", Font.BOLD, 22);
+        Font f2 = new Font("Calibri", Font.PLAIN, 12);
+        Font f3 = new Font("Arial", Font.ITALIC, 16);
+
+        getGraphics().drawString("Time elapsed: " + elapsed, this.getWidth() / 2 - 15, this.getHeight() / 2 - 20);
+        getGraphics().setColor(Color.MAGENTA);
+        getGraphics().setFont(f1);
+        getGraphics().drawString("Ants generated: " + total, this.getWidth() / 2 - 15, this.getHeight() / 2);
+        getGraphics().setColor(Color.BLUE);
+        getGraphics().setFont(f2);
+        getGraphics().drawString("Workers generated: " + workers, this.getWidth() / 2 - 15, this.getHeight() / 2 + 16);
+        getGraphics().setColor(Color.RED);
+        getGraphics().setFont(f3);
+        getGraphics().drawString("Warriors generated: " + warriors, this.getWidth() / 2 - 15, this.getHeight() / 2 + 35);
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (status) {
-            if (timeVisible) {
-                g.drawString("Time elapsed: " + elapsed, 5, 15);
-            }
-            this.setBackground(Color.WHITE);
-            for (int i = 0; i < ants.size(); i++) {
-                paint(g, ants.get(i));
-            }
-        } else {
-            this.removeAll();
-            int workers = 0;
-            int warriors = 0;
-            for (int i = 0; i < ants.size(); i++) {
-                if (ants.get(i) instanceof AntWorker) {
-                    workers++;
-                } else {
-                    warriors++;
-                }
-            }
-            Font f1 = new Font("TimesRoman", Font.BOLD, 22);
-            Font f2 = new Font("Calibri", Font.PLAIN, 12);
-            Font f3 = new Font("Arial", Font.ITALIC, 16);
-
-            g.drawString("Time elapsed: " + elapsed, this.getWidth() / 2 - 15, this.getHeight() / 2 - 20);
-            g.setColor(Color.MAGENTA);
-            g.setFont(f1);
-            g.drawString("Ants generated: " + ants.size(), this.getWidth() / 2 - 15, this.getHeight() / 2);
-            g.setColor(Color.BLUE);
-            g.setFont(f2);
-            g.drawString("Workers generated: " + workers, this.getWidth() / 2 - 15, this.getHeight() / 2 + 16);
-            g.setColor(Color.RED);
-            g.setFont(f3);
-            g.drawString("Warriors generated: " + warriors, this.getWidth() / 2 - 15, this.getHeight() / 2 + 35);
-        }
-
     }
 }
