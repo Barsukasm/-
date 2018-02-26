@@ -9,7 +9,7 @@ public class AntWorker extends Ant {
         super(x, y);
     }
 
-    public static File file = new File("D:\\ProjectsJava\\TP Labs\\Images\\AntWorker.jpg");
+    public static File file = new File("Images/AntWorker.png");
     public static Image img;
 
     static {
