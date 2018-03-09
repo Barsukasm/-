@@ -47,7 +47,7 @@ public class Habitat {
                 if (p1 >= e1 && e1 != 0) {
                     AntWorker aw = new AntWorker((int) (Math.random() * f.getWidth() - 115), (int) (Math.random() * f.getHeight() - 115));
                     ants.add(aw);
-                    av.paint(aw);
+                    //av.repaint(ants);
                 }
             }
             if ((int) (elapsed) % n2 == 0 && (int) elapsed != (int) lastTime) {
@@ -55,9 +55,10 @@ public class Habitat {
                 if (p2 >= e2 && e2 != 0) {
                     AntWarrior awr = new AntWarrior((int) (Math.random() * f.getWidth() - 115), (int) (Math.random() * f.getHeight() - 115));
                     ants.add(awr);
-                    av.paint(awr);
+                    //av.repaint(ants);
                 }
             }
+        av.repaint(ants);
         st.show(timeVisible, this.elapsed);
     }
 
