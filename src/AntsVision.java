@@ -1,6 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.Vector;
 
 public class AntsVision extends JPanel {
 
@@ -13,7 +13,7 @@ public class AntsVision extends JPanel {
         }
     }
 
-    public void repaint(ArrayList<Ant> ants){
+    public void repaint(Vector<Ant> ants){
         for (Ant a:ants){
             paint(a);
         }
@@ -21,8 +21,8 @@ public class AntsVision extends JPanel {
 
 
     public void paint(int total, int workers, int warriors, int elapsed) {
-        paintComponent(getGraphics());
         this.removeAll();
+        paintComponent(getGraphics());
         Font f1 = new Font("TimesRoman", Font.BOLD, 22);
         Font f2 = new Font("Calibri", Font.PLAIN, 12);
         Font f3 = new Font("Arial", Font.ITALIC, 16);
@@ -41,6 +41,8 @@ public class AntsVision extends JPanel {
     }
 
     public void paintComponent(Graphics g) {
+
         super.paintComponent(g);
+
     }
 }
