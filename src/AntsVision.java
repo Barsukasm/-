@@ -20,7 +20,7 @@ public class AntsVision extends JPanel {
     }
 
 
-    public void paint(int total, int workers, int warriors, int elapsed) {
+    /*public void paint(int total, int workers, int warriors, int elapsed) {
         this.removeAll();
         paintComponent(getGraphics());
         Font f1 = new Font("TimesRoman", Font.BOLD, 22);
@@ -38,7 +38,7 @@ public class AntsVision extends JPanel {
         g.setColor(Color.RED);
         g.setFont(f3);
         g.drawString("Warriors generated: " + warriors, this.getWidth() / 2 - 15, this.getHeight() / 2 + 35);
-    }
+    }*/
 
     public void paintComponent(Graphics g) {
 

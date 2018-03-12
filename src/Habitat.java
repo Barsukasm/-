@@ -9,15 +9,15 @@ import java.util.Vector;
 
 public class Habitat {
 
-    private Vector<Ant> ants;
+    protected Vector<Ant> ants;
 
     private int n1,n2;
     private double p1,p2;
-    private GUIFrame f = new GUIFrame("AntsSimulator");
-    private boolean timeVisible = false;
-    private boolean running = false;
-    private int elapsed;
-    private Timer timer;
+    protected GUIFrame f = new GUIFrame("AntsSimulator");
+    protected boolean timeVisible = false;
+    protected boolean running = false;
+    protected int elapsed;
+    protected Timer timer;
     private ModalDialog md = new ModalDialog(f);
 
     public Habitat(int nw1, int nw2, double pw1, double pw2) {
@@ -44,6 +44,10 @@ public class Habitat {
         f.showTimeOn.addActionListener(new showTimerListener());
         f.showTimeOff.addActionListener(new showTimerListener());
         md.ok.addActionListener(new dialogOk());
+        f.startItem.addActionListener(new startMenuAction());
+        f.stopItem.addActionListener(new stopMenuAction());
+        f.timerItem.addActionListener(new showMenuAction());
+        f.exitItem.addActionListener(new exitMenuAction());
         md.cancel.addActionListener(new dialogCancel());
     }
 
@@ -73,12 +77,18 @@ public class Habitat {
         public boolean dispatchKeyEvent(KeyEvent e){
             if (e.getID()==KeyEvent.KEY_PRESSED){
             if (e.getKeyCode() == KeyEvent.VK_B&&!running) {
+                n1 = Integer.parseInt(f.nWorkers.getText());
+                n2 = Integer.parseInt(f.nWarriors.getText());
+                p1 = (double) f.jbox.getSelectedIndex()/10;
+                p2 = (double) f.jbox2.getSelectedIndex()/10;
                 timer = new Timer();
                 timer.schedule(new Updater(Habitat.this), 0, 1000);
                 f.av.repaint();
                 running = true;
                 f.start.setEnabled(false);
                 f.stop.setEnabled(true);
+                f.startItem.setEnabled(false);
+                f.stopItem.setEnabled(true);
             }
             if (e.getKeyCode() == KeyEvent.VK_T) {
                 if (timeVisible) {
@@ -90,8 +100,6 @@ public class Habitat {
                 }
             }
             if (e.getKeyCode() == KeyEvent.VK_E&&running) {
-                /*timer.cancel();
-                timer = null;*/
                 int warriors = 0, workers = 0;
                 for (int i = 0; i < ants.size(); i++) {
                     if (ants.get(i) instanceof AntWarrior) {
@@ -104,12 +112,6 @@ public class Habitat {
                 timer.cancel();
                 timer = null;
                 md.setVisible(true);
-                /*f.av.paint(ants.size(), workers, warriors, elapsed);
-                f.st.repaint();
-                ants.clear();
-                running = false;
-                f.start.setEnabled(true);
-                f.stop.setEnabled(false);*/
             }
             }
             return false;
@@ -120,12 +122,18 @@ public class Habitat {
 
         public void actionPerformed(ActionEvent e){
             if (!running){
+                n1 = Integer.parseInt(f.nWorkers.getText());
+                n2 = Integer.parseInt(f.nWarriors.getText());
+                p1 = (double) f.jbox.getSelectedIndex()/10;
+                p2 = (double) f.jbox2.getSelectedIndex()/10;
                 timer = new Timer();
                 timer.schedule(new Updater(Habitat.this), 0, 1000);
                 f.av.repaint();
                 running = true;
                 f.start.setEnabled(false);
                 f.stop.setEnabled(true);
+                f.startItem.setEnabled(false);
+                f.stopItem.setEnabled(true);
             }
         }
     }
@@ -134,8 +142,6 @@ public class Habitat {
 
         public void actionPerformed(ActionEvent e){
             if (running) {
-                /*timer.cancel();
-                timer = null;*/
                 int warriors = 0, workers = 0;
                 for (int i = 0; i < ants.size(); i++) {
                     if (ants.get(i) instanceof AntWarrior) {
@@ -146,12 +152,6 @@ public class Habitat {
                 }
                 timer.cancel();
                 timer = null;
-               /* f.av.paint(ants.size(), workers, warriors, elapsed);
-                f.st.repaint();
-                ants.clear();
-                running = false;
-                f.start.setEnabled(true);
-                f.stop.setEnabled(false);*/
                 md.setStats(ants.size(),workers,warriors,elapsed);
                 md.setVisible(true);
             }
@@ -178,6 +178,8 @@ public class Habitat {
             running = false;
             f.start.setEnabled(true);
             f.stop.setEnabled(false);
+            f.startItem.setEnabled(true);
+            f.stopItem.setEnabled(false);
             md.setVisible(false);
         }
     }
@@ -191,6 +193,67 @@ public class Habitat {
             md.setVisible(false);
         }
     }
+
+    public class startMenuAction implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (!running) {
+                n1 = Integer.parseInt(f.nWorkers.getText());
+                n2 = Integer.parseInt(f.nWarriors.getText());
+                p1 = (double) f.jbox.getSelectedIndex()/10;
+                p2 = (double) f.jbox2.getSelectedIndex()/10;
+                timer = new Timer();
+                timer.schedule(new Updater(Habitat.this), 0, 1000);
+                f.av.repaint();
+                running = true;
+                f.start.setEnabled(false);
+                f.stop.setEnabled(true);
+                f.startItem.setEnabled(false);
+                f.stopItem.setEnabled(true);
+            }
+        }
+    }
+
+    public class stopMenuAction implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (running) {
+                int warriors = 0, workers = 0;
+                for (int i = 0; i < ants.size(); i++) {
+                    if (ants.get(i) instanceof AntWarrior) {
+                        warriors++;
+                    } else {
+                        workers++;
+                    }
+                }
+                md.setStats(ants.size(),workers,warriors,elapsed);
+                timer.cancel();
+                timer = null;
+                md.setVisible(true);
+            }
+        }
+    }
+
+    public class showMenuAction implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (timeVisible) {
+                timeVisible = false;
+                f.showTimeOff.setSelected(true);
+            } else {
+                timeVisible = true;
+                f.showTimeOn.setSelected(true);
+            }
+        }
+    }
+
+    public class exitMenuAction implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            System.exit(0);
+        }
+    }
+
 }
 
 
