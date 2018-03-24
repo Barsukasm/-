@@ -3,7 +3,6 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Timer;
 
 public class GUIFrame extends JFrame {
 
@@ -28,7 +27,7 @@ public class GUIFrame extends JFrame {
     JMenu failMenu = new JMenu("File");
     JMenuItem startItem = new JMenuItem("Start");
     JMenuItem stopItem = new JMenuItem("Stop");
-    JMenuItem timerItem = new JMenuItem("Show/Hide item");
+    JMenuItem timerItem = new JMenuItem("Show/Hide time");
     JMenuItem exitItem = new JMenuItem("Exit");
     JTextField nWorkers = new JTextField(10);
     JTextField nWarriors = new JTextField(10);
@@ -89,13 +88,11 @@ public class GUIFrame extends JFrame {
         showTimeGr.add(showTimeOn);
         showTimeGr.add(showTimeOff);
 
-        setLayout(new FlowLayout(FlowLayout.CENTER));
-        add(mainPanel);
+        setLayout(new BorderLayout());
+        add(mainPanel, BorderLayout.CENTER);
 
 
         st.setPreferredSize(new Dimension(110, 20));
-        av.setPreferredSize(new Dimension(900, 600));
-        av.setBorder(new LineBorder(Color.BLACK));
         p1.setLayout(new BorderLayout());
         p1.add(st, BorderLayout.NORTH);
         p1.add(av, BorderLayout.CENTER);

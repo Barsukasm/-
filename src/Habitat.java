@@ -3,8 +3,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.*;
 import java.util.Timer;
-import java.util.Vector;
 
 
 public class Habitat {
@@ -17,11 +17,15 @@ public class Habitat {
     protected boolean timeVisible = false;
     protected boolean running = false;
     protected int elapsed;
+    protected HashSet<Integer> ids;
+    protected TreeMap<Integer,Integer> timeTree;
     protected Timer timer;
     private ModalDialog md = new ModalDialog(f);
 
     public Habitat(int nw1, int nw2, double pw1, double pw2) {
-        ants = new Vector<Ant>();
+        ants = new Vector<>();
+        ids = new HashSet<>();
+        timeTree = new TreeMap<>();
         n1 =nw1;
         n2 = nw2;
         p1 = pw1;
@@ -49,22 +53,83 @@ public class Habitat {
         f.timerItem.addActionListener(new showMenuAction());
         f.exitItem.addActionListener(new exitMenuAction());
         md.cancel.addActionListener(new dialogCancel());
+
+        //времменно установим параметры вручную
+        AntWarrior.lifeTime = 25;
+        AntWorker.lifeTime = 40;
     }
 
     void update(double elapsed, double lastTime) {
         this.elapsed = (int) elapsed;
+
+        //Удаление старых объектов
+        int ct = 0, a;
+        Ant ta = null;
+        Iterator<Integer> iter = ids.iterator();
+        while (iter.hasNext()){
+            a = iter.next();
+
+            try{
+                ct = timeTree.get(a);
+            }catch (NullPointerException e){}
+            for (Ant m:ants){
+                if (m.id==a){
+                    ta = m;
+                }
+            }
+            if (ta instanceof AntWorker) {
+                if ((this.elapsed - ct) > AntWorker.lifeTime) {
+                    ants.remove(ta);
+                    timeTree.remove(a);
+                    iter.remove();
+                }
+            } else{
+                if (ta instanceof AntWarrior &&(this.elapsed-ct)>AntWarrior.lifeTime){
+                    ants.remove(ta);
+                    timeTree.remove(a);
+                    iter.remove();
+                }
+            }
+        }
+
+
+        //Генерация новых объектов
             if ((int) (elapsed) % n1 == 0 && (int) elapsed != (int) lastTime) {
                 double e1 = Math.random();
                 if (p1 >= e1 && e1 != 0) {
-                    AntWorker aw = new AntWorker((int) (Math.random() * f.av.getWidth() - 55), (int) (Math.random() * f.av.getHeight() - 55));
-                    ants.add(aw);
+                    AntWorker aw = new AntWorker((int) (Math.random() * f.av.getWidth() - 55), (int) (Math.random() * f.av.getHeight() - 55), this.elapsed);
+                    boolean in = ids.add(aw.id);
+                    int n = 1;
+                    if(!in){
+                        while (!in||n<Ant.diapason){
+                            aw.reroll();
+                            in = ids.add(aw.id);
+                            n++;
+                        }
+                    }
+                    if(in){
+                        ants.add(aw);
+                        timeTree.put(aw.id,aw.spawnTime);
+                    }
                 }
             }
             if ((int) (elapsed) % n2 == 0 && (int) elapsed != (int) lastTime) {
                 double e2 = Math.random();
                 if (p2 >= e2 && e2 != 0) {
-                    AntWarrior awr = new AntWarrior((int) (Math.random() * f.av.getWidth() - 55), (int) (Math.random() * f.av.getHeight() - 55));
-                    ants.add(awr);
+                    AntWarrior awr = new AntWarrior((int) (Math.random() * f.av.getWidth() - 55), (int) (Math.random() * f.av.getHeight() - 55),this.elapsed);
+                    boolean in = ids.add(awr.id);
+                    int n = 1;
+                    if(!in){
+                        while (!in||n<Ant.diapason){
+                            awr.reroll();
+                            in = ids.add(awr.id);
+                            n++;
+                        }
+                    }
+                    if(in){
+                        ants.add(awr);
+                        timeTree.put(awr.id,awr.spawnTime);
+                    }
                 }
             }
         f.av.repaint(ants);

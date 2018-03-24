@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.util.Vector;
 
@@ -14,6 +15,8 @@ public class AntsVision extends JPanel {
     }
 
     public void repaint(Vector<Ant> ants){
+        paintComponent(getGraphics());
+        setBorder(new LineBorder(Color.BLACK));
         for (Ant a:ants){
             paint(a);
         }

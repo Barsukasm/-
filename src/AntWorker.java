@@ -5,12 +5,13 @@ import java.io.IOException;
 
 public class AntWorker extends Ant {
 
-    public AntWorker(int x, int y) {
-        super(x, y);
+    public AntWorker(int x, int y, int curTime) {
+        super(x, y, curTime);
     }
 
     public static File file = new File("Images/AntWorker.png");
     public static Image img;
+    public static int lifeTime = 1;
 
     static {
 
