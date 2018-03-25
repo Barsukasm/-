@@ -2,7 +2,7 @@ public abstract class Ant implements IBehaviour {
 
     protected int dx, dy;
     protected int spawnTime, id;
-    public static int diapason = 1000;
+    public static int diapason = 10000;
 //Конструктор по умолчанию
     public Ant() {
         dx = 0;

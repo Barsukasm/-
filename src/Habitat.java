@@ -1,8 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.util.*;
 import java.util.Timer;
 
@@ -21,6 +19,7 @@ public class Habitat {
     protected TreeMap<Integer,Integer> timeTree;
     protected Timer timer;
     private ModalDialog md = new ModalDialog(f);
+    private CurrentObjDia curObjs = new CurrentObjDia(f);
 
     public Habitat(int nw1, int nw2, double pw1, double pw2) {
         ants = new Vector<>();
@@ -53,10 +52,10 @@ public class Habitat {
         f.timerItem.addActionListener(new showMenuAction());
         f.exitItem.addActionListener(new exitMenuAction());
         md.cancel.addActionListener(new dialogCancel());
-
-        //времменно установим параметры вручную
-        AntWarrior.lifeTime = 25;
-        AntWorker.lifeTime = 40;
+        f.showObjs.addActionListener(new curObjsButton());
+        curObjs.ok.addActionListener(new curObjsOK());
+        md.addWindowListener(new modalDialogWindowListener());
+        curObjs.addWindowListener(new curObjWindowListener());
     }
 
     void update(double elapsed, double lastTime) {
@@ -68,13 +67,10 @@ public class Habitat {
         Iterator<Integer> iter = ids.iterator();
         while (iter.hasNext()){
             a = iter.next();
-
-            try{
-                ct = timeTree.get(a);
-            }catch (NullPointerException e){}
             for (Ant m:ants){
                 if (m.id==a){
                     ta = m;
+                    ct = timeTree.get(a);
                 }
             }
             if (ta instanceof AntWorker) {
@@ -99,8 +95,8 @@ public class Habitat {
                 if (p1 >= e1 && e1 != 0) {
                     AntWorker aw = new AntWorker((int) (Math.random() * f.av.getWidth() - 55), (int) (Math.random() * f.av.getHeight() - 55), this.elapsed);
                     boolean in = ids.add(aw.id);
-                    int n = 1;
                     if(!in){
+                        int n = 1;
                         while (!in||n<Ant.diapason){
                             aw.reroll();
                             in = ids.add(aw.id);
@@ -118,8 +114,8 @@ public class Habitat {
                 if (p2 >= e2 && e2 != 0) {
                     AntWarrior awr = new AntWarrior((int) (Math.random() * f.av.getWidth() - 55), (int) (Math.random() * f.av.getHeight() - 55),this.elapsed);
                     boolean in = ids.add(awr.id);
-                    int n = 1;
                     if(!in){
+                        int n = 1;
                         while (!in||n<Ant.diapason){
                             awr.reroll();
                             in = ids.add(awr.id);
@@ -132,7 +128,8 @@ public class Habitat {
                     }
                 }
             }
-        f.av.repaint(ants);
+        f.av.setMass(ants);
+        f.av.repaint();
         f.st.show(timeVisible, this.elapsed);
     }
 
@@ -144,6 +141,10 @@ public class Habitat {
             if (e.getKeyCode() == KeyEvent.VK_B&&!running) {
                 n1 = Integer.parseInt(f.nWorkers.getText());
                 n2 = Integer.parseInt(f.nWarriors.getText());
+                AntWorker.lifeTime = Integer.parseInt(f.workersLifeTime.getText());
+                AntWarrior.lifeTime = Integer.parseInt(f.warriorsLifeTime.getText());
+                if(AntWorker.lifeTime == 0) AntWorker.lifeTime = 1;
+                if (AntWarrior.lifeTime == 0) AntWarrior.lifeTime = 1;
                 p1 = (double) f.jbox.getSelectedIndex()/10;
                 p2 = (double) f.jbox2.getSelectedIndex()/10;
                 timer = new Timer();
@@ -189,6 +190,10 @@ public class Habitat {
             if (!running){
                 n1 = Integer.parseInt(f.nWorkers.getText());
                 n2 = Integer.parseInt(f.nWarriors.getText());
+                AntWorker.lifeTime = Integer.parseInt(f.workersLifeTime.getText());
+                AntWarrior.lifeTime = Integer.parseInt(f.warriorsLifeTime.getText());
+                if(AntWorker.lifeTime == 0) AntWorker.lifeTime = 1;
+                if (AntWarrior.lifeTime == 0) AntWarrior.lifeTime = 1;
                 p1 = (double) f.jbox.getSelectedIndex()/10;
                 p2 = (double) f.jbox2.getSelectedIndex()/10;
                 timer = new Timer();
@@ -265,6 +270,10 @@ public class Habitat {
             if (!running) {
                 n1 = Integer.parseInt(f.nWorkers.getText());
                 n2 = Integer.parseInt(f.nWarriors.getText());
+                AntWorker.lifeTime = Integer.parseInt(f.workersLifeTime.getText());
+                AntWarrior.lifeTime = Integer.parseInt(f.warriorsLifeTime.getText());
+                if(AntWorker.lifeTime == 0) AntWorker.lifeTime = 1;
+                if (AntWarrior.lifeTime == 0) AntWarrior.lifeTime = 1;
                 p1 = (double) f.jbox.getSelectedIndex()/10;
                 p2 = (double) f.jbox2.getSelectedIndex()/10;
                 timer = new Timer();
@@ -319,6 +328,50 @@ public class Habitat {
         }
     }
 
+    public class curObjsButton implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (running) {
+                timer.cancel();
+                timer = null;
+                curObjs.setMsg(ants);
+                curObjs.setVisible(true);
+            }
+        }
+    }
+
+    public class curObjsOK implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            timer = new Timer();
+            Updater upd = new Updater(Habitat.this);
+            upd.setStartTime((long) elapsed);
+            timer.schedule(upd, 0, 1000);
+            curObjs.setVisible(false);
+        }
+    }
+
+    public class curObjWindowListener extends WindowAdapter{
+        @Override
+        public void windowClosing(WindowEvent windowEvent) {
+            timer = new Timer();
+            Updater upd = new Updater(Habitat.this);
+            upd.setStartTime((long) elapsed);
+            timer.schedule(upd, 0, 1000);
+            curObjs.setVisible(false);
+        }
+    }
+
+    public class modalDialogWindowListener extends WindowAdapter{
+        @Override
+        public void windowClosing(WindowEvent windowEvent) {
+            timer = new Timer();
+            Updater upd = new Updater(Habitat.this);
+            upd.setStartTime((long) elapsed);
+            timer.schedule(upd, 0, 1000);
+            md.setVisible(false);
+        }
+    }
 }
 
 

@@ -15,8 +15,11 @@ public class GUIFrame extends JFrame {
     JPanel p231 = new JPanel();
     JPanel p232 = new JPanel();
     JPanel p24 = new JPanel();
-    Button start = new Button("Start");
-    Button stop = new Button("Stop");
+    JPanel p25 = new JPanel();
+    JPanel p251 = new JPanel();
+    JPanel p26 = new JPanel();
+    JButton start = new JButton("Start");
+    JButton stop = new JButton("Stop");
     AntsVision av = new AntsVision();
     ShowTime st = new ShowTime();
     KeyboardFocusManager manager;
@@ -31,6 +34,8 @@ public class GUIFrame extends JFrame {
     JMenuItem exitItem = new JMenuItem("Exit");
     JTextField nWorkers = new JTextField(10);
     JTextField nWarriors = new JTextField(10);
+    JTextField workersLifeTime = new JTextField(10);
+    JTextField warriorsLifeTime = new JTextField(10);
     String[] pers = { "0%","10%","20%","30%","40%","50%","60%","70%","80%","90%","100%"};
     JComboBox jbox = new JComboBox(pers);
     JComboBox jbox2 = new JComboBox(pers);
@@ -38,6 +43,9 @@ public class GUIFrame extends JFrame {
     JLabel q2 = new JLabel("Warriors spawn frequency:");
     JLabel chance1 = new JLabel("Workers spawn chance:");
     JLabel chance2 = new JLabel("Warriors spawn chance:");
+    JLabel lifeTimeWk = new JLabel("Workers lifetime:");
+    JLabel lifeTimeWr = new JLabel("Warriors lifetime:");
+    JButton showObjs = new JButton("Current objects");
 
 
 
@@ -48,6 +56,8 @@ public class GUIFrame extends JFrame {
 
         nWorkers.setText("3");
         nWarriors.setText("4");
+        workersLifeTime.setText("1");
+        warriorsLifeTime.setText("1");
 
         nWorkers.addKeyListener(new KeyAdapter() {
             @Override
@@ -65,7 +75,28 @@ public class GUIFrame extends JFrame {
                 super.keyTyped(keyEvent);
                 char b = keyEvent.getKeyChar();
                 if(!Character.isDigit(b)){
-                    nWarriors.setText("");
+                    keyEvent.consume();
+                }
+            }
+        });
+
+        workersLifeTime.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent keyEvent) {
+                super.keyTyped(keyEvent);
+                char a = keyEvent.getKeyChar();
+                if(!Character.isDigit(a)){
+                    keyEvent.consume();
+                }
+            }
+        });
+        warriorsLifeTime.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent keyEvent) {
+                super.keyTyped(keyEvent);
+                char b = keyEvent.getKeyChar();
+                if(!Character.isDigit(b)){
+                    keyEvent.consume();
                 }
             }
         });
@@ -93,6 +124,7 @@ public class GUIFrame extends JFrame {
 
 
         st.setPreferredSize(new Dimension(110, 20));
+        av.setBorder(new LineBorder(Color.BLACK));
         p1.setLayout(new BorderLayout());
         p1.add(st, BorderLayout.NORTH);
         p1.add(av, BorderLayout.CENTER);
@@ -104,12 +136,18 @@ public class GUIFrame extends JFrame {
         p231.setLayout(new FlowLayout());
         p232.setLayout(new FlowLayout());
         p24.setLayout(new FlowLayout());
+        p25.setLayout(new FlowLayout());
+        p251.setLayout(new FlowLayout());
+        p26.setLayout(new FlowLayout());
         p2.add(p21);
         p2.add(p22);
         p2.add(p231);
         p2.add(p23);
         p2.add(p232);
         p2.add(p24);
+        p2.add(p251);
+        p2.add(p25);
+        p2.add(p26);
         p21.add(start);
         p21.add(stop);
         p22.add(showTimeOn);
@@ -122,6 +160,11 @@ public class GUIFrame extends JFrame {
         p232.add(chance1);
         p232.add(chance2);
         p24.add(jbox2);
+        p251.add(lifeTimeWk);
+        p251.add(lifeTimeWr);
+        p25.add(workersLifeTime);
+        p25.add(warriorsLifeTime);
+        p26.add(showObjs);
 
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(p1, BorderLayout.CENTER);
