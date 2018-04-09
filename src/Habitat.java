@@ -57,6 +57,8 @@ public class Habitat {
         curObjs.ok.addActionListener(new curObjsOK());
         md.addWindowListener(new modalDialogWindowListener());
         curObjs.addWindowListener(new curObjWindowListener());
+        f.warriorsAIButton.addActionListener(new warriorsAISwitcher());
+        f.workerAIButton.addActionListener(new workersAISwitcher());
     }
 
     public void dying(){
@@ -152,6 +154,8 @@ public class Habitat {
         if (AntWarrior.lifeTime == 0) AntWarrior.lifeTime = 1;
         p1 = (double) f.jbox.getSelectedIndex()/10;
         p2 = (double) f.jbox2.getSelectedIndex()/10;
+        int wp = f.workersprior.getSelectedIndex();
+        int wap = f.warriorsprior.getSelectedIndex();
         timer = new Timer();
         timer.schedule(new Updater(Habitat.this), 0, 1000);
         f.av.repaint();
@@ -164,6 +168,26 @@ public class Habitat {
         warriorAI.start();
         workerAI = new WorkerAI(ants);
         workerAI.start();
+        switch (wp){
+            case 0:
+                workerAI.setPriority(Thread.MIN_PRIORITY);
+                break;
+            case 1:
+                workerAI.setPriority(Thread.NORM_PRIORITY);
+            case 2:
+                workerAI.setPriority(Thread.MAX_PRIORITY);
+                break;
+        }
+        switch (wap){
+            case 0:
+                warriorAI.setPriority(Thread.MIN_PRIORITY);
+                break;
+            case 1:
+                warriorAI.setPriority(Thread.NORM_PRIORITY);
+            case 2:
+                warriorAI.setPriority(Thread.MAX_PRIORITY);
+                break;
+        }
     }
 
     public void command_stop(){
@@ -357,6 +381,36 @@ public class Habitat {
         public void windowClosing(WindowEvent windowEvent) {
             command_resume();
             md.setVisible(false);
+        }
+    }
+
+    public class workersAISwitcher implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (workerAI!=null){
+                if (!workerAI.pause) {
+                    workerAI.pause = true;
+                    f.workerAIButton.setText("Workers AI off");
+                } else {
+                    workerAI.pause = false;
+                    f.workerAIButton.setText("Workers AI on");
+                }
+            }
+        }
+    }
+
+    public class warriorsAISwitcher implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (warriorAI != null){
+                if (!warriorAI.pause) {
+                    warriorAI.pause = true;
+                    f.warriorsAIButton.setText("Warriors AI off");
+                } else {
+                    warriorAI.pause = false;
+                    f.warriorsAIButton.setText("Warriors AI on");
+                }
+            }
         }
     }
 }

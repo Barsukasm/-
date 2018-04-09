@@ -1,9 +1,9 @@
 public interface IBehaviour {
     void move();
 
-    int getx();
+    double getx();
 
-    int gety();
+    double gety();
 
     void setx(int x);
 

@@ -18,6 +18,9 @@ public class GUIFrame extends JFrame {
     JPanel p25 = new JPanel();
     JPanel p251 = new JPanel();
     JPanel p26 = new JPanel();
+    JPanel p27 = new JPanel();
+    JPanel p28 = new JPanel();
+    JPanel p29 = new JPanel();
     JButton start = new JButton("Start");
     JButton stop = new JButton("Stop");
     AntsVision av = new AntsVision();
@@ -46,6 +49,13 @@ public class GUIFrame extends JFrame {
     JLabel lifeTimeWk = new JLabel("Workers lifetime:");
     JLabel lifeTimeWr = new JLabel("Warriors lifetime:");
     JButton showObjs = new JButton("Current objects");
+    JButton workerAIButton = new JButton("Workers AI on");
+    JButton warriorsAIButton = new JButton("Warriors AI on");
+    String[] priors = {"min", "normal", "max"};
+    JLabel priority1 = new JLabel("Workers priority:");
+    JLabel priority2 = new JLabel("Warriors priority:");
+    JComboBox workersprior = new JComboBox(priors);
+    JComboBox warriorsprior = new JComboBox(priors);
 
 
 
@@ -130,15 +140,6 @@ public class GUIFrame extends JFrame {
         p1.add(av, BorderLayout.CENTER);
 
         p2.setLayout(new GridLayout(0,1));
-        p21.setLayout(new FlowLayout());
-        p22.setLayout(new FlowLayout());
-        p23.setLayout(new FlowLayout());
-        p231.setLayout(new FlowLayout());
-        p232.setLayout(new FlowLayout());
-        p24.setLayout(new FlowLayout());
-        p25.setLayout(new FlowLayout());
-        p251.setLayout(new FlowLayout());
-        p26.setLayout(new FlowLayout());
         p2.add(p21);
         p2.add(p22);
         p2.add(p231);
@@ -148,6 +149,9 @@ public class GUIFrame extends JFrame {
         p2.add(p251);
         p2.add(p25);
         p2.add(p26);
+        p2.add(p27);
+        p2.add(p28);
+        p2.add(p29);
         p21.add(start);
         p21.add(stop);
         p22.add(showTimeOn);
@@ -165,6 +169,13 @@ public class GUIFrame extends JFrame {
         p25.add(workersLifeTime);
         p25.add(warriorsLifeTime);
         p26.add(showObjs);
+        p27.add(workerAIButton);
+        p27.add(warriorsAIButton);
+        p28.add(priority1);
+        p28.add(priority2);
+        p29.add(workersprior);
+        p29.add(warriorsprior);
+
 
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(p1, BorderLayout.CENTER);

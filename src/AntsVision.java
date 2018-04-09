@@ -9,9 +9,9 @@ public class AntsVision extends JPanel {
 
     public void paint(Ant a, Graphics g) {
         if (a instanceof AntWorker) {
-            g.drawImage(AntWorker.img, a.getx(), a.gety(), this);
+            g.drawImage(AntWorker.img, (int) a.getx(), (int) a.gety(), this);
         } else {
-            g.drawImage(AntWarrior.img, a.getx(), a.gety(), this);
+            g.drawImage(AntWarrior.img, (int) a.getx(), (int) a.gety(), this);
         }
     }
 

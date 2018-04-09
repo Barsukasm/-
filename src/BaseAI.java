@@ -18,11 +18,6 @@ public abstract class BaseAI extends Thread {
             try{
                 Thread.sleep(1000);
             }catch (InterruptedException ex){}
-            while (pause){
-                try{
-                    av.wait();
-                }catch (InterruptedException ex){}
-            }
         }
 
     }

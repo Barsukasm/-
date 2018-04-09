@@ -5,8 +5,14 @@ import java.io.IOException;
 
 public class AntWarrior extends Ant {
 
+    public int c1, c2;
+    public static double V = 0.225;
+    public static int R = 50;
+    protected int T = 0;
     public AntWarrior(int x, int y, int curTime) {
         super(x, y, curTime);
+        c1 = x + 50;
+        c2 = y;
     }
 
     public static File file = new File("Images/AntWarrior.png");
@@ -23,8 +29,9 @@ public class AntWarrior extends Ant {
 
     @Override
     public void move(){
-        dx+=10;
-        dy+=10;
+        dx = c1 - R*(Math.cos(V*T));
+        dy = c2 - R*(Math.sin(V*T));
+        T++;
     }
 
 }
