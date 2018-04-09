@@ -24,7 +24,8 @@ public class AntWorker extends Ant {
 
     @Override
     public void move(){
-
+        dx+=10;
+        dy+=10;
     }
 
 }
