@@ -1,6 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.PipedInputStream;
 import java.util.*;
 import java.util.Timer;
 
@@ -18,9 +21,12 @@ public class Habitat {
     protected TreeMap<Integer,Integer> timeTree;
     protected Timer timer;
     private ModalDialog md = new ModalDialog(f);
+    public Console cd = new Console(f, this);
     private CurrentObjDia curObjs = new CurrentObjDia(f);
     public WarriorAI warriorAI;
     public WorkerAI workerAI;
+    public ConsManager cm = new ConsManager(this);
+    public boolean kBlocked = false;
 
     public Habitat(int nw1, int nw2, double pw1, double pw2) {
         ants = new Vector<>();
@@ -51,6 +57,7 @@ public class Habitat {
         f.startItem.addActionListener(new startMenuAction());
         f.stopItem.addActionListener(new stopMenuAction());
         f.timerItem.addActionListener(new showMenuAction());
+        f.consoleItem.addActionListener(new consoleMenuAction());
         f.exitItem.addActionListener(new exitMenuAction());
         md.cancel.addActionListener(new dialogCancel());
         f.showObjs.addActionListener(new curObjsButton());
@@ -59,6 +66,18 @@ public class Habitat {
         curObjs.addWindowListener(new curObjWindowListener());
         f.warriorsAIButton.addActionListener(new warriorsAISwitcher());
         f.workerAIButton.addActionListener(new workersAISwitcher());
+        f.addWindowListener(new endOnClose());
+        cd.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                kBlocked = false;
+                cd.clear();
+            }
+        });
+        try{
+            cm.setStream(new DataInputStream(new PipedInputStream(cd.getStream())));
+        }catch (IOException e){}
+        cm.start();
     }
 
     public void dying(){
@@ -200,16 +219,14 @@ public class Habitat {
             }
         }
         md.setStats(ants.size(),workers,warriors,elapsed);
-        timer.cancel();
-        timer = null;
         if (warriorAI != null){
-            warriorAI.going = false;
-            warriorAI = null;
+            warriorAI.pause = true;
         }
         if (workerAI != null){
-            workerAI.going = false;
-            workerAI = null;
+            workerAI.pause = true;
         }
+        timer.cancel();
+        timer = null;
         md.setVisible(true);
     }
 
@@ -224,13 +241,11 @@ public class Habitat {
     }
 
     public void command_resume(){
-        if(warriorAI == null){
-            warriorAI = new WarriorAI(ants);
-            warriorAI.start();
+        if (warriorAI != null){
+            warriorAI.pause = false;
         }
-        if(workerAI == null) {
-            workerAI = new WorkerAI(ants);
-            workerAI.start();
+        if (workerAI!= null){
+            workerAI.pause = false;
         }
         timer = new Timer();
         Updater upd = new Updater(Habitat.this);
@@ -242,16 +257,18 @@ public class Habitat {
 
     public class KDispatcher implements KeyEventDispatcher{
         public boolean dispatchKeyEvent(KeyEvent e){
-            if (e.getID()==KeyEvent.KEY_PRESSED){
-            if (e.getKeyCode() == KeyEvent.VK_B&&!running) {
-                command_Start();
-            }
-            if (e.getKeyCode() == KeyEvent.VK_T) {
-                command_time();
-            }
-            if (e.getKeyCode() == KeyEvent.VK_E&&running) {
-                command_stop();
-            }
+            if (!kBlocked){
+                if (e.getID()==KeyEvent.KEY_PRESSED){
+                    if (e.getKeyCode() == KeyEvent.VK_B&&!running) {
+                        command_Start();
+                    }
+                    if (e.getKeyCode() == KeyEvent.VK_T) {
+                        command_time();
+                    }
+                    if (e.getKeyCode() == KeyEvent.VK_E&&running) {
+                        command_stop();
+                    }
+                }
             }
             return false;
         }
@@ -292,6 +309,14 @@ public class Habitat {
             f.av.repaint();
             f.st.repaint();
             ants.clear();
+            if (warriorAI != null){
+                warriorAI.going = false;
+                warriorAI = null;
+            }
+            if (workerAI != null){
+                workerAI.going = false;
+                workerAI = null;
+            }
             running = false;
             f.start.setEnabled(true);
             f.stop.setEnabled(false);
@@ -333,6 +358,14 @@ public class Habitat {
         }
     }
 
+    public class consoleMenuAction implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            kBlocked = true;
+            cd.setVisible(true);
+        }
+    }
+
     public class exitMenuAction implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
@@ -347,12 +380,10 @@ public class Habitat {
                 timer.cancel();
                 timer = null;
                 if (warriorAI != null){
-                    warriorAI.going = false;
-                    warriorAI = null;
+                    warriorAI.pause = true;
                 }
-                if (workerAI != null){
-                    workerAI.going = false;
-                    workerAI = null;
+                if (workerAI!=null){
+                    workerAI.pause = true;
                 }
                 curObjs.setMsg(ants);
                 curObjs.setVisible(true);
@@ -368,11 +399,28 @@ public class Habitat {
         }
     }
 
+
+
     public class curObjWindowListener extends WindowAdapter{
         @Override
         public void windowClosing(WindowEvent windowEvent) {
             command_resume();
             curObjs.setVisible(false);
+        }
+    }
+
+    public class endOnClose extends WindowAdapter{
+        @Override
+        public void windowClosing(WindowEvent windowEvent) {
+            if (warriorAI != null){
+                warriorAI.going = false;
+                warriorAI = null;
+            }
+            if (workerAI != null){
+                workerAI.going = false;
+                workerAI = null;
+            }
+            if(cm!=null) cm.running = false;
         }
     }
 
@@ -414,5 +462,4 @@ public class Habitat {
         }
     }
 }
-
 

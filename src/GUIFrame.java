@@ -34,6 +34,7 @@ public class GUIFrame extends JFrame {
     JMenuItem startItem = new JMenuItem("Start");
     JMenuItem stopItem = new JMenuItem("Stop");
     JMenuItem timerItem = new JMenuItem("Show/Hide time");
+    JMenuItem consoleItem = new JMenuItem("Console");
     JMenuItem exitItem = new JMenuItem("Exit");
     JTextField nWorkers = new JTextField(10);
     JTextField nWarriors = new JTextField(10);
@@ -115,6 +116,7 @@ public class GUIFrame extends JFrame {
         failMenu.add(startItem);
         failMenu.add(stopItem);
         failMenu.add(timerItem);
+        failMenu.add(consoleItem);
         failMenu.addSeparator();
         failMenu.add(exitItem);
 
