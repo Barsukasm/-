@@ -1,9 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
+import java.io.*;
 import java.util.*;
 import java.util.Timer;
 
@@ -20,6 +18,7 @@ public class Habitat {
     protected HashSet<Integer> ids;
     protected TreeMap<Integer,Integer> timeTree;
     protected Timer timer;
+    protected Properties props;
     private ModalDialog md = new ModalDialog(f);
     public Console cd = new Console(f, this);
     private CurrentObjDia curObjs = new CurrentObjDia(f);
@@ -27,6 +26,22 @@ public class Habitat {
     public WorkerAI workerAI;
     public ConsManager cm = new ConsManager(this);
     public boolean kBlocked = false;
+
+
+    Properties defProps(){
+        Properties properties = new Properties();
+        properties.setProperty("BornWorker","3");
+        properties.setProperty("BornWarrior","4");
+        properties.setProperty("ChanceWorker","0.8");
+        properties.setProperty("ChanceWarrior","0.5");
+        properties.setProperty("WorkerLifetime","10");
+        properties.setProperty("WarriorLifetime","5");
+        properties.setProperty("WorkerPrior","1");
+        properties.setProperty("WarriorPrior", "1");
+        return properties;
+    }
+
+
 
     public Habitat(int nw1, int nw2, double pw1, double pw2) {
         ants = new Vector<>();
@@ -38,9 +53,34 @@ public class Habitat {
         p2 = pw2;
     }
 
-
+    void setProper(Properties properties){
+        n1 = Integer.parseInt(properties.getProperty("BornWorker"));
+        f.nWorkers.setText(String.valueOf(n1));
+        n2 = Integer.parseInt(properties.getProperty("BornWarrior"));
+        f.nWarriors.setText(String.valueOf(n2));
+        p1 = Double.parseDouble(properties.getProperty("ChanceWorker"));
+        f.jbox.setSelectedIndex((int)(p1*10));
+        p2 = Double.parseDouble(properties.getProperty("ChanceWarrior"));
+        f.jbox2.setSelectedIndex((int)(p2*10));
+        AntWorker.lifeTime = Integer.parseInt(properties.getProperty("WorkerLifetime"));
+        f.workersLifeTime.setText(String.valueOf(AntWorker.lifeTime));
+        AntWarrior.lifeTime = Integer.parseInt(properties.getProperty("WarriorLifetime"));
+        f.warriorsLifeTime.setText(String.valueOf(AntWarrior.lifeTime));
+        f.workersprior.setSelectedIndex(Integer.parseInt(properties.getProperty("WorkerPrior")));
+        f.warriorsprior.setSelectedIndex(Integer.parseInt(properties.getProperty("WarriorPrior")));
+    }
 
     public void start() {
+        props = new Properties();
+        try {
+            props.load(new FileInputStream(new File("config.properties")));
+        } catch (IOException e){
+            try{
+                defProps().store(new FileOutputStream(new File("config.properties")),"config");
+                props = defProps();
+            } catch (IOException ex){}
+        }
+        setProper(props);
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setBounds(0, 0, (int) (dimension.getWidth() - 10), (int) (dimension.getHeight() - 10));
@@ -66,6 +106,8 @@ public class Habitat {
         curObjs.addWindowListener(new curObjWindowListener());
         f.warriorsAIButton.addActionListener(new warriorsAISwitcher());
         f.workerAIButton.addActionListener(new workersAISwitcher());
+        f.saveItem.addActionListener(saveListener);
+        f.loadItem.addActionListener(loadListener);
         f.addWindowListener(new endOnClose());
         cd.addWindowListener(new WindowAdapter() {
             @Override
@@ -412,6 +454,18 @@ public class Habitat {
     public class endOnClose extends WindowAdapter{
         @Override
         public void windowClosing(WindowEvent windowEvent) {
+            props.setProperty("BornWorker",String.valueOf(n1));
+            props.setProperty("BornWarrior",String.valueOf(n2));
+            props.setProperty("ChanceWorker",String.valueOf(p1));
+            props.setProperty("ChanceWarrior",String.valueOf(p2));
+            props.setProperty("WorkerLifetime",String.valueOf(AntWorker.lifeTime));
+            props.setProperty("WarriorLifetime",String.valueOf(AntWarrior.lifeTime));
+            props.setProperty("WorkerPrior",String.valueOf(f.workersprior.getSelectedIndex()));
+            props.setProperty("WarriorPrior", String.valueOf(f.warriorsprior.getSelectedIndex()));
+            try {
+                props.store(new FileOutputStream(new File("config.properties")),"config");
+            } catch (IOException exp){}
+
             if (warriorAI != null){
                 warriorAI.going = false;
                 warriorAI = null;
@@ -461,5 +515,72 @@ public class Habitat {
             }
         }
     }
+
+
+    private ActionListener saveListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JFileChooser fileSave = new JFileChooser();
+            try {
+                ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("ants.txt"));
+                for (Ant ant : ants) {
+                    oos.writeObject(ant); // Сериализация
+                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+    };
+
+    private ActionListener loadListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (running){
+                command_stop();
+                f.av.repaint();
+                f.st.repaint();
+                ants.clear();
+                if (warriorAI != null){
+                    warriorAI.going = false;
+                    warriorAI = null;
+                }
+                if (workerAI != null){
+                    workerAI.going = false;
+                    workerAI = null;
+                }
+                running = false;
+                f.start.setEnabled(true);
+                f.stop.setEnabled(false);
+                f.startItem.setEnabled(true);
+                f.stopItem.setEnabled(false);
+            }
+            JFileChooser fileopen = new JFileChooser();
+            int ret = fileopen.showDialog(null, "Open file");
+            if (ret == JFileChooser.APPROVE_OPTION) {
+                File file = fileopen.getSelectedFile();
+                try {
+                    ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+                    while (true) {
+                        Object obj = null;
+                        try {
+                            obj = ois.readObject();
+                        } catch (IOException | ClassNotFoundException ex) {
+                            break;
+                        }
+                        if (!(obj instanceof Ant)) {
+                            continue;
+                        }
+                        Ant ant = (Ant) obj;
+                        ant.spawnTime = 0;
+                        ants.add(ant);
+                        ids.add(ant.id);
+                        timeTree.put(ant.id,ant.spawnTime);
+                    }
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
+    };
 }
 

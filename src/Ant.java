@@ -1,4 +1,6 @@
-public abstract class Ant implements IBehaviour {
+import java.io.Serializable;
+
+public abstract class Ant implements IBehaviour, Serializable {
 
     protected int x1, y1;
     protected double dx, dy;
