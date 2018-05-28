@@ -1,5 +1,8 @@
+package Client;
+
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
+import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.DataOutputStream;
@@ -11,6 +14,7 @@ public class Console extends JDialog {
     DataOutputStream pw;
     PipedOutputStream po = new PipedOutputStream();
     JTextArea entr = new JTextArea();
+    JScrollPane pane = new JScrollPane(entr);
     public Habitat hb;
     String msg;
 
@@ -18,7 +22,8 @@ public class Console extends JDialog {
     public Console(JFrame owner, Habitat h){
         super(owner,"Console", false);
         setBounds(500,250,500,200);
-        add(entr);
+        add(pane);
+        pane.setSize(getSize());
         entr.setSize(getSize());
         pw = new DataOutputStream(po);
         hb = h;

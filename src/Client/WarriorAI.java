@@ -1,8 +1,10 @@
+package Client;
+
 import java.util.Vector;
 
-public class WorkerAI extends BaseAI {
+public class WarriorAI extends BaseAI {
 
-    public WorkerAI(Vector<Ant> vec){
+    public WarriorAI(Vector<Ant> vec){
         super(vec);
     }
 
@@ -16,7 +18,7 @@ public class WorkerAI extends BaseAI {
                     }catch (InterruptedException ex){}
                 }
                 for (Ant a:av){
-                    if (a instanceof AntWorker){
+                    if (a instanceof AntWarrior){
                         a.move();
                     }
                 }

@@ -1,3 +1,5 @@
+package Client;
+
 import java.io.Serializable;
 
 public abstract class Ant implements IBehaviour, Serializable {

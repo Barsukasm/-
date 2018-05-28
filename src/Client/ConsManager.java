@@ -1,3 +1,5 @@
+package Client;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 

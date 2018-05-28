@@ -1,7 +1,10 @@
+package Client;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.net.Socket;
 import java.util.*;
 import java.util.Timer;
 
@@ -11,7 +14,7 @@ public class Habitat {
     public Vector<Ant> ants;
     private int n1,n2;
     private double p1,p2;
-    protected GUIFrame f = new GUIFrame("AntsSimulator");
+    protected GUIFrame f = new GUIFrame("AntsSimulator", this);
     protected boolean timeVisible = false;
     protected boolean running = false;
     protected int elapsed;
@@ -26,6 +29,7 @@ public class Habitat {
     public WorkerAI workerAI;
     public ConsManager cm = new ConsManager(this);
     public boolean kBlocked = false;
+    public String id;
 
 
     Properties defProps(){
@@ -120,6 +124,8 @@ public class Habitat {
             cm.setStream(new DataInputStream(new PipedInputStream(cd.getStream())));
         }catch (IOException e){}
         cm.start();
+        f.soket.addActionListener(new SocketButtonL());
+        f.importAnts.addActionListener(importButton);
     }
 
     public void dying(){
@@ -454,12 +460,12 @@ public class Habitat {
     public class endOnClose extends WindowAdapter{
         @Override
         public void windowClosing(WindowEvent windowEvent) {
-            props.setProperty("BornWorker",String.valueOf(n1));
-            props.setProperty("BornWarrior",String.valueOf(n2));
-            props.setProperty("ChanceWorker",String.valueOf(p1));
-            props.setProperty("ChanceWarrior",String.valueOf(p2));
-            props.setProperty("WorkerLifetime",String.valueOf(AntWorker.lifeTime));
-            props.setProperty("WarriorLifetime",String.valueOf(AntWarrior.lifeTime));
+            props.setProperty("BornWorker",f.nWorkers.getText());
+            props.setProperty("BornWarrior",f.nWarriors.getText());
+            props.setProperty("ChanceWorker",String.valueOf((double) f.jbox.getSelectedIndex()/10));
+            props.setProperty("ChanceWarrior",String.valueOf((double) f.jbox2.getSelectedIndex()/10));
+            props.setProperty("WorkerLifetime",f.workersLifeTime.getText());
+            props.setProperty("WarriorLifetime",f.warriorsLifeTime.getText());
             props.setProperty("WorkerPrior",String.valueOf(f.workersprior.getSelectedIndex()));
             props.setProperty("WarriorPrior", String.valueOf(f.warriorsprior.getSelectedIndex()));
             try {
@@ -475,6 +481,11 @@ public class Habitat {
                 workerAI = null;
             }
             if(cm!=null) cm.running = false;
+            try {
+                socket.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 
@@ -523,9 +534,7 @@ public class Habitat {
             JFileChooser fileSave = new JFileChooser();
             try {
                 ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("ants.txt"));
-                for (Ant ant : ants) {
-                    oos.writeObject(ant); // Сериализация
-                }
+                oos.writeObject(ants); // Сериализация
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
@@ -560,19 +569,11 @@ public class Habitat {
                 File file = fileopen.getSelectedFile();
                 try {
                     ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-                    while (true) {
-                        Object obj = null;
-                        try {
-                            obj = ois.readObject();
-                        } catch (IOException | ClassNotFoundException ex) {
-                            break;
-                        }
-                        if (!(obj instanceof Ant)) {
-                            continue;
-                        }
-                        Ant ant = (Ant) obj;
+                    try {
+                        ants = (Vector<Ant>) ois.readObject();
+                    } catch (IOException | ClassNotFoundException ex) {}
+                    for (Ant ant:ants){
                         ant.spawnTime = 0;
-                        ants.add(ant);
                         ids.add(ant.id);
                         timeTree.put(ant.id,ant.spawnTime);
                     }
@@ -582,5 +583,54 @@ public class Habitat {
             }
         }
     };
+
+
+    Socket socket;
+    NetThread netThread;
+    Emitter socketEmitter;
+    ArrayList<String> users;
+    private boolean open;
+
+    public class SocketButtonL implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            String host = "localhost";
+            int port = 8888;
+            if (!open){
+                f.soket.setText("Close");
+                try {
+                    socket = new Socket(host,port);
+                    netThread = new NetThread(Habitat.this,socket);
+                    netThread.start();
+                    socketEmitter = new Emitter(socket, Habitat.this);
+                }catch (IOException ex){
+                    ex.printStackTrace();
+                }
+            }else {
+                f.soket.setText("Open");
+                try{
+                    socket.getInputStream().close();
+                    socket.getOutputStream().close();
+                    socket.close();
+                    netThread.stop();
+                    //netThread.running=false;
+                }catch (IOException ex){
+                    ex.printStackTrace();
+                }
+            }
+            open=!open;
+        }
+    }
+
+    private ActionListener importButton = e -> {
+        try {
+            String string = (String) f.usersL.getSelectedValue();
+            socketEmitter.importAnts(string);
+        }catch (IOException ex){
+
+        }
+    };
+
+
 }
 

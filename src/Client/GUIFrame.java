@@ -1,8 +1,14 @@
+package Client;
+
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import javax.swing.plaf.metal.MetalBorders;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 public class GUIFrame extends JFrame {
 
@@ -21,6 +27,8 @@ public class GUIFrame extends JFrame {
     JPanel p27 = new JPanel();
     JPanel p28 = new JPanel();
     JPanel p29 = new JPanel();
+    JPanel p3 = new JPanel();
+    JPanel p31 = new JPanel();
     JButton start = new JButton("Start");
     JButton stop = new JButton("Stop");
     AntsVision av = new AntsVision();
@@ -59,14 +67,18 @@ public class GUIFrame extends JFrame {
     JLabel priority2 = new JLabel("Warriors priority:");
     JComboBox workersprior = new JComboBox(priors);
     JComboBox warriorsprior = new JComboBox(priors);
+    JList usersL;
+    DefaultListModel listModel;
+    JButton soket = new JButton("Open");
+    JButton importAnts = new JButton("Import ants");
+    Habitat owner;
 
 
 
 
-
-    public GUIFrame(String s) {
+    public GUIFrame(String s, Habitat owner) {
         super(s);
-
+        this.owner = owner;
         nWorkers.setText("3");
         nWarriors.setText("4");
         workersLifeTime.setText("1");
@@ -140,6 +152,14 @@ public class GUIFrame extends JFrame {
         add(mainPanel, BorderLayout.CENTER);
 
 
+        listModel = new DefaultListModel();
+        usersL = new JList(listModel);
+        JScrollPane usersPane = new JScrollPane(usersL);
+        usersPane.setPreferredSize(new Dimension(200,300));
+
+        //usersL.setPreferredSize(new Dimension(200,300));
+        usersL.setBorder(new LineBorder(Color.BLACK));
+        usersL.setLayoutOrientation(JList.VERTICAL);
         st.setPreferredSize(new Dimension(110, 20));
         av.setBorder(new LineBorder(Color.BLACK));
         p1.setLayout(new BorderLayout());
@@ -159,6 +179,8 @@ public class GUIFrame extends JFrame {
         p2.add(p27);
         p2.add(p28);
         p2.add(p29);
+        p2.add(p3);
+        //p2.add(p31);
         p21.add(start);
         p21.add(stop);
         p22.add(showTimeOn);
@@ -182,12 +204,21 @@ public class GUIFrame extends JFrame {
         p28.add(priority2);
         p29.add(workersprior);
         p29.add(warriorsprior);
-
+        p3.add(soket);
+        p3.add(importAnts);
+        p31.add(usersPane);
 
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(p1, BorderLayout.CENTER);
         mainPanel.add(p2, BorderLayout.EAST);
+        mainPanel.add(p31,BorderLayout.WEST);
     }
 
+    public void updateUsersList(){
+        listModel.clear();
+        for(int i=0;i<owner.users.size();i++){
+            if(!owner.id.equals(owner.users.get(i))) listModel.addElement(owner.users.get(i));
+        }
+    }
 
 }

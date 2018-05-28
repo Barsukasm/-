@@ -1,3 +1,5 @@
+package Client;
+
 import java.util.Vector;
 
 public abstract class BaseAI extends Thread {

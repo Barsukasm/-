@@ -1,3 +1,5 @@
+package Client;
+
 public interface IBehaviour {
     void move();
 
