@@ -9,7 +9,7 @@ public class Request implements Serializable {
     String requestedID;
 
     ArrayList<String> users;
-    public Vector<Ant> ants;
+    public Vector<AntMes> ants;
     public HashSet<Integer> ids;
     public TreeMap<Integer,Integer> timeTree;
 
@@ -19,7 +19,7 @@ public class Request implements Serializable {
         this.users = users;
     }
 
-    public Request(String command,String id, Vector<Ant> ants, HashSet<Integer> ids, TreeMap<Integer,Integer> timeTree){
+    public Request(String command,String id, Vector<AntMes> ants, HashSet<Integer> ids, TreeMap<Integer,Integer> timeTree){
         this.command = command;
         this.id = id;
         this.ants = ants;

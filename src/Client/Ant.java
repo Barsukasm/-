@@ -35,6 +35,22 @@ public abstract class Ant implements IBehaviour, Serializable {
         return dx;
     }
 
+    public int getX1() {
+        return x1;
+    }
+
+    public int getY1() {
+        return y1;
+    }
+
+    public void setX1(int x1) {
+        this.x1 = x1;
+    }
+
+    public void setY1(int y1) {
+        this.y1 = y1;
+    }
+
     @Override
     public double gety() {
         return dy;
@@ -50,6 +66,10 @@ public abstract class Ant implements IBehaviour, Serializable {
         dy=y;
     }
 
+    public int getId() {
+        return id;
+    }
+
     @Override
     public int hashCode() {
         return id;
@@ -58,5 +78,9 @@ public abstract class Ant implements IBehaviour, Serializable {
     public void reroll(){
         id = 0;
         id = (int)(Math.random()*diapason);
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

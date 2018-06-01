@@ -6,6 +6,7 @@ import com.google.gson.stream.JsonReader;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Vector;
 
 public class NetThread extends Thread {
     private final Habitat habitat;
@@ -43,7 +44,8 @@ public class NetThread extends Thread {
                JsonReader reader = new JsonReader(new StringReader(string));
                reader.setLenient(true);
                request = gson.fromJson(reader,Request.class);
-               ArrayList<Ant> ants = new ArrayList<>();
+               Vector<AntMes> antsMes = new Vector<>();
+               Vector<Ant> antToAdd = new Vector<>();
                switch (request.getCommand()){
                    case "update":
                        System.out.println("update list");
@@ -58,19 +60,33 @@ public class NetThread extends Thread {
                        habitat.f.updateUsersList();
                        break;
                    case "choose":
-                       Request request1 = new Request("copy", request.getId(), habitat.ants,habitat.ids,habitat.timeTree);
+                       antsMes.clear();
+                       for (int i=0;i<habitat.ants.size();i++){
+                           Ant ant = habitat.ants.get(i);
+                           String type = ant instanceof AntWorker ? "worker" : "warrior";
+                           antsMes.add(new AntMes((int)ant.getx(), (int)ant.gety(), ant.getId(), type));
+                       }
+                       Request request1 = new Request("copy", request.getId(), antsMes,habitat.ids,habitat.timeTree);
                        String rq = gson.toJson(request1);
                        System.out.println("Send data to " + rq);
                        outStream.write(rq.getBytes());
                        break;
                    case "copy":
-                        habitat.ants.clear();
-                        habitat.ants = request.ants;
-                        habitat.ids.clear();
-                        habitat.ids = request.ids;
-                        habitat.timeTree.clear();
-                        habitat.timeTree = request.timeTree;
-                        habitat.elapsed = 0;
+                       habitat.ants.clear();
+                       for(int i=0; i<request.ants.size(); i++) {
+                           AntMes newAM = request.ants.get(i);
+                           Ant ant = newAM.getType().equals("worker") ? new AntWorker() : new AntWarrior();
+                           ant.setx(newAM.getx());
+                           ant.sety(newAM.gety());
+                           ant.setId(newAM.getId());
+                           antToAdd.add(ant);
+                       }
+                       habitat.ants = antToAdd;
+                       habitat.ids.clear();
+                       habitat.ids = request.ids;
+                       habitat.timeTree.clear();
+                       habitat.timeTree = request.timeTree;
+                       habitat.elapsed = 0;
                        break;
                    default:
                        System.out.println("default");

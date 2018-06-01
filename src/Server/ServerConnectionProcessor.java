@@ -45,17 +45,19 @@ public class ServerConnectionProcessor extends Thread {
                 switch (request.getCommand()){
                     case "choose":
                         System.out.println("Requested: " + string);
-                        for (int i=0;i<Server.users.size();i++){
-                            if (request.getRequestedID().equals(Server.users.get(i))){
-                                Socket sk = Server.sockets.get(i);
-                                sk.getOutputStream().write(bytes);
+                        if (request.getRequestedID()!=null){
+                            for (int i=0;i<Server.users.size();i++){
+                                if (request.getRequestedID().equals(Server.users.get(i))){
+                                    Socket sk = Server.sockets.get(i);
+                                    sk.getOutputStream().write(bytes);
+                                }
                             }
-                        }
+                        } else System.out.println("You forgot ID, baka!");
                         break;
                     case "copy":
                         System.out.println("Send copy to " + string);
                         for (int i = 0;i<Server.users.size();i++){
-                            if (request.getRequestedID().equals(Server.users.get(i))){
+                            if (request.getId().equals(Server.users.get(i))){
                                 Socket sk = Server.sockets.get(i);
                                 sk.getOutputStream().write(bytes);
                             }
@@ -65,7 +67,7 @@ public class ServerConnectionProcessor extends Thread {
                         break;
                 }
             }catch (Exception ex){
-                System.out.println(ex);
+                System.out.println(ex.getLocalizedMessage());
                 try {
                     inStream.close();
                     outStream.close();

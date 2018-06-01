@@ -11,6 +11,13 @@ public class AntWarrior extends Ant {
     public static double V = 0.225;
     public static int R = 50;
     protected int T = 0;
+    private boolean wOinit = false;
+
+    public AntWarrior(){
+        super();
+        wOinit = true;
+    }
+
     public AntWarrior(int x, int y, int curTime) {
         super(x, y, curTime);
         c1 = x + 50;
@@ -31,6 +38,11 @@ public class AntWarrior extends Ant {
 
     @Override
     public void move(){
+        if (wOinit){
+            c1 = (int)dx + 50;
+            c2 = (int)dy;
+            wOinit = false;
+        }
         dx = c1 - R*(Math.cos(V*T));
         dy = c2 - R*(Math.sin(V*T));
         T++;

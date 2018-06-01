@@ -18,8 +18,8 @@ public class Habitat {
     protected boolean timeVisible = false;
     protected boolean running = false;
     protected int elapsed;
-    protected HashSet<Integer> ids;
-    protected TreeMap<Integer,Integer> timeTree;
+    public HashSet<Integer> ids;
+    public TreeMap<Integer,Integer> timeTree;
     protected Timer timer;
     protected Properties props;
     private ModalDialog md = new ModalDialog(f);

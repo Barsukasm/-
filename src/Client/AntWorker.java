@@ -10,7 +10,14 @@ public class AntWorker extends Ant {
     public double x2, y2;
     public static int V = 5;
     protected int T = 0;
+    private boolean wOinit = false;
     boolean inOut = false;
+
+    public AntWorker(){
+        super();
+        wOinit = true;
+    }
+
     public AntWorker(int x, int y, int curTime) {
         super(x, y, curTime);
         double a = 0 - x;
@@ -34,6 +41,15 @@ public class AntWorker extends Ant {
 
     @Override
     public void move(){
+        if (wOinit){
+            x1 = (int)dx;
+            y1 = (int)dy;
+            double a = 0 - dx;
+            double b = 0 - dy;
+            x2 = a/Math.sqrt(a*a+b*b);
+            y2 = b/Math.sqrt(a*a+b*b);
+            wOinit = false;
+        }
         if(dx<=0&&dy<=0) {
             inOut = true;
             T = 1;
